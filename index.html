@@ -139,11 +139,14 @@ body{
 .s-red{color:var(--red)}
 .vial{width:64px; height:110px; margin:26px 0 2px; display:block}
 .vial *{vector-effect:non-scaling-stroke}
+.c-text{display:block; width:100%; margin-top:auto}
+.c-name,.c-brand,.c-fam{display:block}
 .c-name{
   font-family:var(--f-disp); font-weight:700; font-size:1.22rem;
-  margin:auto 0 0; text-align:center; line-height:1.15; color:var(--ink);
+  margin:0; text-align:center; line-height:1.15; color:var(--ink);
   text-wrap:balance;
 }
+.c-pick{display:none}
 .c-brand{
   margin:7px 0 0; font-size:.62rem; letter-spacing:.19em; text-transform:uppercase;
   color:var(--ink-2); text-align:center; line-height:1.5;
@@ -164,14 +167,17 @@ body{
   min-height:330px;
 }
 .tray-top{
-  display:flex; align-items:baseline; justify-content:space-between; gap:14px;
-  flex-wrap:wrap; padding-bottom:16px; border-bottom:1px solid var(--edge-soft);
+  display:flex; align-items:flex-start; justify-content:space-between; gap:14px;
+  flex-wrap:nowrap; padding-bottom:16px; border-bottom:1px solid var(--edge-soft);
 }
+.tray-top > div{min-width:0}
+.t-suit{flex:0 0 auto}
 .t-title{
   font-family:var(--f-disp); font-size:1.6rem; font-weight:400; color:var(--ivory);
   margin:0; line-height:1.15;
 }
-.t-brand{margin:5px 0 0; font-size:.64rem; letter-spacing:.24em; text-transform:uppercase; color:var(--muted)}
+.t-brand{margin:6px 0 0; font-size:.64rem; letter-spacing:.22em; text-transform:uppercase; color:var(--muted)}
+.t-fam{margin:7px 0 0; font-size:.8rem; color:var(--gold); letter-spacing:.03em}
 .t-suit{font-size:1.5rem; color:var(--gold); line-height:1; font-family:var(--f-disp)}
 .t-suit.s-red{color:#C4585F}
 
@@ -300,25 +306,49 @@ footer{
   .wrap{padding-inline:0}
   .top,.mesa,.how,footer,.helper{padding-inline:18px}
   .tray{margin-inline:18px; padding:22px 18px 22px}
+
+  /* las tres cartas boca arriba sobre el fieltro, nada se corta */
   .fan{
-    display:grid; grid-auto-flow:column; justify-content:start;
-    gap:12px; margin-top:24px; padding:12px 18px 30px;
-    overflow-x:auto; scroll-snap-type:x proximity;
-    scroll-padding-inline:18px;
-    -webkit-overflow-scrolling:touch; perspective:none;
-    scrollbar-width:none;
+    display:grid; grid-auto-flow:row; gap:11px;
+    margin-top:24px; padding:4px 18px 28px;
+    perspective:none; overflow:visible;
   }
-  .fan::-webkit-scrollbar{display:none}
   .card{
-    margin-inline:0; width:min(60vw,206px);
-    scroll-snap-align:start;
+    --rot:0deg; --lift:0px;
+    width:100%; aspect-ratio:auto; min-height:98px;
+    margin-inline:0; padding:15px 16px;
+    flex-direction:row; align-items:center; gap:15px;
+    border-radius:12px;
   }
-  .card:nth-child(1),.card:nth-child(2),.card:nth-child(3){--rot:0deg; --lift:0px}
-  .card[aria-pressed="true"]{--lift:-6px}
+  .card:nth-child(1),.card:nth-child(2),.card:nth-child(3){--rot:0deg; --lift:0px; z-index:auto}
+  .card:hover{transform:none}
+  .card[aria-pressed="true"]{--lift:0px; transform:none}
+  .corner{
+    position:static; flex:0 0 auto;
+    font-size:1.05rem; gap:1px;
+  }
+  .corner.br{display:none}
+  .vial{width:38px; height:66px; margin:0; flex:0 0 auto}
+  .c-text{margin-top:0; flex:1 1 auto; min-width:0}
+  .c-name{text-align:left; font-size:1.1rem}
+  .c-brand{text-align:left; margin:4px 0 0; font-size:.58rem; letter-spacing:.17em}
+  .c-fam{text-align:left; margin:5px 0 0; font-size:.7rem}
+  .c-pick{
+    display:block; flex:0 0 auto;
+    width:20px; height:20px; border-radius:50%;
+    border:1.5px dashed rgba(20,16,9,.28); background:transparent;
+    transition:background .25s ease, border-color .25s ease, box-shadow .25s ease;
+  }
+  .card[aria-pressed="true"] .c-pick{
+    border:1.5px solid #9C7D33;
+    background:radial-gradient(circle at 34% 30%,#E7CE92,#9C7D33);
+    box-shadow:0 0 0 3px rgba(156,125,51,.16);
+  }
   @keyframes deal{
-    from{opacity:0; transform:translateY(-64px) scale(.94)}
-    to{opacity:1; transform:translateY(var(--lift))}
+    from{opacity:0; transform:translateY(22px)}
+    to{opacity:1; transform:translateY(0)}
   }
+  .dealt .card{animation-duration:.42s}
   .go{width:100%}
   .go-note{max-width:none}
 }
@@ -447,7 +477,7 @@ const FRAGANCIAS = [
 ];
 
 const TAMANOS = [
-  {id:"10", b:"10 ml", s:"Tamaño único", texto:"decant de 10 ml"},
+  {id:"10", b:"10 ml", s:"Único", texto:"decant de 10 ml"},
   {id:"?",  b:"Asesórame", s:"La casa decide", texto:null}
 ];
 
@@ -479,9 +509,12 @@ fan.innerHTML = FRAGANCIAS.map(f => `
     ${corner(f.suit,"")}
     ${corner(f.suit," br")}
     ${vial(f.vial)}
-    <h3 class="c-name">${f.nombre}</h3>
-    <p class="c-brand">${f.marca}</p>
-    <p class="c-fam">${f.familia}</p>
+    <span class="c-text">
+      <span class="c-name">${f.nombre}</span>
+      <span class="c-brand">${f.marca}</span>
+      <span class="c-fam">${f.familia}</span>
+    </span>
+    <span class="c-pick" aria-hidden="true"></span>
   </button>`).join("");
 
 function pips(n){
@@ -515,7 +548,8 @@ function pintar(){
       <div>
         <p class="kicker">Tu jugada</p>
         <h3 class="t-title">${f.nombre}</h3>
-        <p class="t-brand">${f.linea ? f.linea + " · " : ""}${f.marca} · ${f.familia}</p>
+        <p class="t-brand">${f.linea ? f.linea + " · " : ""}${f.marca}</p>
+        <p class="t-fam">${f.familia}</p>
       </div>
       <span class="t-suit${red}" aria-hidden="true">A${SUITS[f.suit]}</span>
     </div>
@@ -574,7 +608,7 @@ fan.addEventListener("click", e => {
   elegida = b.dataset.id;
   pintar();
   if (window.innerWidth <= 700) {
-    tray.scrollIntoView({behavior:"smooth", block:"start"});
+    tray.scrollIntoView({behavior:"smooth", block:"nearest"});
   }
 });
 
