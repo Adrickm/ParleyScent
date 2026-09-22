@@ -191,6 +191,22 @@ body{
 .dt{font-size:.58rem; letter-spacing:.26em; text-transform:uppercase; color:var(--gold)}
 .dd{margin:0; font-size:.9rem; line-height:1.55; color:var(--bone)}
 
+.side{display:grid; gap:24px; align-content:start}
+.pyr{display:grid; margin:0; padding:0; list-style:none}
+.pyr li{position:relative; display:grid; grid-template-columns:13px 1fr; column-gap:12px; padding-bottom:15px}
+.pyr li:last-child{padding-bottom:0}
+.pyr li::before{
+  content:""; grid-column:1; grid-row:1 / span 2;
+  width:9px; height:9px; margin:2px 0 0 2px; border-radius:50%;
+  border:1px solid var(--gold); background:var(--felt-1);
+  position:relative; z-index:1;
+}
+.pyr li:first-child::before{background:var(--gold)}
+.pyr li::after{content:""; position:absolute; left:6px; top:13px; bottom:0; width:1px; background:var(--edge)}
+.pyr li:last-child::after{display:none}
+.p-k{grid-column:2; font-size:.58rem; letter-spacing:.26em; text-transform:uppercase; color:var(--gold); line-height:1.4}
+.p-k i{font-style:normal; font-size:.7rem; letter-spacing:.04em; text-transform:none; color:var(--muted); margin-left:8px}
+.p-v{grid-column:2; margin:4px 0 0; font-size:.88rem; line-height:1.5; color:var(--bone)}
 .meters{display:grid; gap:14px; align-content:start}
 .meter{display:grid; gap:7px}
 .m-row{display:flex; align-items:center; justify-content:space-between; gap:10px}
@@ -435,44 +451,58 @@ const RED = ["heart","diamond"];
 
 const FRAGANCIAS = [
   {
-    id:"9am",
-    nombre:"9 AM",
-    marca:"Afnan",
-    suit:"spade",
-    familia:"Ámbar · Especiado",
-    frase:"La apuesta segura de la casa. Nadie se levanta de la mesa sin preguntarte qué traes puesto.",
-    cuando:"De la clase de la mañana a la salida de la noche, sin pasar a tu casa a rociarte otra vez.",
-    para:"El que quiere una sola fragancia que le funcione para todo.",
-    proyeccion:3,
-    duracion:3,
-    vial:"sphere"
-  },
-  {
-    id:"ysl",
-    nombre:"Eau de Parfum",
-    marca:"Yves Saint Laurent",
-    suit:"diamond",
-    familia:"Floral · Elegante",
-    frase:"Elegancia que no necesita farolear. Se nota de cerca y se recuerda de lejos.",
-    cuando:"Cena, cita, presentación final. Cuando quieres que se acuerden de ti al día siguiente.",
-    para:"El que prefiere que lo huelan bien tres personas y no todo el salón.",
+    id:"cloud",
+    nombre:"Cloud 2.0",
+    marca:"Ariana Grande",
+    suit:"heart",
+    familia:"Gourmand · Cremoso",
+    frase:"La carta dulce de la mesa. Praliné, coco y crema: suave como su nombre y difícil de soltar.",
+    cuando:"Tardes de lluvia, café con alguien, clases de la tarde y planes tranquilos.",
+    para:"Quien prefiere un dulce suave y cremoso a un perfume que grite.",
+    notas:{
+      salida:"Pera, lavanda, bergamota",
+      corazon:"Praliné, coco, orquídea, crema",
+      fondo:"Cashmeran, almizcle, madera"
+    },
     proyeccion:3,
     duracion:4,
-    vial:"square"
+    vial:"cloud"
   },
   {
-    id:"paradise",
-    nombre:"Paradise Garden",
-    marca:"Jean Paul Gaultier",
-    linea:"Le Beau",
+    id:"9pm-night-out",
+    nombre:"9 PM Night Out",
+    marca:"Afnan",
     suit:"club",
-    familia:"Frutal · Floral",
-    frase:"Verde, tropical y fresca. Juega sola contra el calor de Tuxtla y gana.",
-    cuando:"Mediodía a 34 grados, fin de semana, alberca, cualquier cosa con sol encima.",
-    para:"El que se rinde con los perfumes pesados a media mañana.",
+    familia:"Licoroso · Dulce",
+    frase:"La mano para cuando cae la noche. Coñac, toffee y gamuza: entra fuerte y aguanta hasta el cierre.",
+    cuando:"Fiestas, antros, salidas de viernes. Mejor de noche, cuando el calor ya bajó.",
+    para:"Quien quiere que se note cuando llega.",
+    notas:{
+      salida:"Pitahaya, lavanda, coñac, manzana, bergamota",
+      corazon:"Toffee, cardamomo, gamuza, cedro",
+      fondo:"Haba tonka, pachulí, madera Akigala"
+    },
     proyeccion:4,
-    duracion:3,
-    vial:"round"
+    duracion:4,
+    vial:"flask"
+  },
+  {
+    id:"profondo",
+    nombre:"Acqua di Giò Profondo",
+    marca:"Giorgio Armani",
+    suit:"spade",
+    familia:"Acuático · Aromático",
+    frase:"La apuesta segura de la casa. Fresca, limpia y marina: no falla en ninguna mesa.",
+    cuando:"Diario. De la clase de las 7 al mediodía a 34 grados en Tuxtla.",
+    para:"Quien quiere una sola fragancia que le funcione para todo.",
+    notas:{
+      salida:"Mandarina verde, bergamota, notas marinas",
+      corazon:"Romero, lavanda, ciprés",
+      fondo:"Ámbar, pachulí, almizcle"
+    },
+    proyeccion:3,
+    duracion:4,
+    vial:"tall"
   }
 ];
 
@@ -487,7 +517,10 @@ function vial(tipo){
   const cuerpos = {
     sphere:`<circle cx="28" cy="17" r="10" ${S}/><rect x="25.5" y="3" width="5" height="6" ${S}/><rect x="17" y="27" width="22" height="62" rx="3" ${S}/><line x1="17" y1="44" x2="39" y2="44" ${S}/>`,
     square:`<rect x="23" y="3" width="10" height="8" rx="1.5" ${S}/><rect x="19" y="11" width="18" height="12" rx="2" ${S}/><rect x="16" y="23" width="24" height="66" rx="4" ${S}/>`,
-    round:`<circle cx="28" cy="16" r="9.5" ${S}/><rect x="25.5" y="2.5" width="5" height="6" ${S}/><path d="M17.5 30c4 5 17 5 21 0" ${S}/><rect x="17" y="26" width="22" height="63" rx="10" ${S}/>`
+    round:`<circle cx="28" cy="16" r="9.5" ${S}/><rect x="25.5" y="2.5" width="5" height="6" ${S}/><path d="M17.5 30c4 5 17 5 21 0" ${S}/><rect x="17" y="26" width="22" height="63" rx="10" ${S}/>`,
+    cloud:`<circle cx="30" cy="26" r="6.5" ${S}/><rect x="27.5" y="32.5" width="5" height="9" ${S}/><path d="M13 80H44A10 10 0 0 0 46 60A14 14 0 0 0 20 52A11 11 0 0 0 7 63A8.5 8.5 0 0 0 13 80Z" ${S}/>`,
+    flask:`<circle cx="28" cy="10" r="6.5" ${S}/><rect x="25" y="16.5" width="6" height="5.5" ${S}/><path d="M21 22H35Q39 22 39 26Q42 38 42 56Q42 88 28 88Q14 88 14 56Q14 38 17 26Q17 22 21 22Z" ${S}/>`,
+    tall:`<rect x="20.5" y="3" width="15" height="12" rx="3" ${S}/><rect x="25" y="15" width="6" height="5" ${S}/><rect x="16" y="20" width="24" height="69" rx="3" ${S}/>`
   };
   return `<svg class="vial" viewBox="0 0 56 96" aria-hidden="true">${cuerpos[tipo]||cuerpos.round}</svg>`;
 }
@@ -562,6 +595,12 @@ function pintar(){
           <div><dt class="dt">Para quién</dt><dd class="dd">${f.para}</dd></div>
         </dl>
       </div>
+      <div class="side">
+      <ol class="pyr" aria-label="Pirámide olfativa">
+        <li><span class="p-k">Salida<i>al rociar</i></span><p class="p-v">${f.notas.salida}</p></li>
+        <li><span class="p-k">Corazón<i>a la media hora</i></span><p class="p-v">${f.notas.corazon}</p></li>
+        <li><span class="p-k">Fondo<i>lo que se queda</i></span><p class="p-v">${f.notas.fondo}</p></li>
+      </ol>
       <div class="meters">
         <div class="meter">
           <div class="m-row"><span class="m-label">Proyección</span><span class="m-val">${f.proyeccion}/5</span></div>
@@ -571,6 +610,7 @@ function pintar(){
           <div class="m-row"><span class="m-label">Duración</span><span class="m-val">${f.duracion}/5</span></div>
           ${pips(f.duracion)}
         </div>
+      </div>
       </div>
     </div>
 
